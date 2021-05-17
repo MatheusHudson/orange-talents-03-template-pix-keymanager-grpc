@@ -1,0 +1,42 @@
+micronaut:
+  application:
+    name: desafioPix
+
+datasources:
+  default:
+    url: jdbc:mysql://${SPRING_BD_HOST:localhost}:${BANCO_PORT:3306}/${SPRING_BANCO_NOME:pixgRPC}
+    username: root
+    password: 'root'
+    schema-generate: UPDATE
+    dialect: mysql
+jpa.default.properties.hibernate.hbm2ddl.auto: update
+
+
+
+#datasources:
+#  default:
+#    url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+#    driverClassName: org.h2.Driver
+#    username: sa
+#    password: ''
+#    schema-generate: CREATE_DROP
+#    dialect: H2
+#jpa.default.properties.hibernate.hbm2ddl.auto: update
+
+vertx:
+  mysql:
+    client:
+      port: ${PORT:3308}
+      host: ${HOST:localhost}
+      database: pixgRPC
+      user: root
+      password: root
+      maxSize: 5
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        show_sql: true

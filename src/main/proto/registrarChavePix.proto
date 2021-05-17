@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.com.zup";
+option java_outer_classname = "CadastrarChavePix";
+
+
+package br.com.zup;
+
+service RegistrarChaveService {
+  rpc registrarChave (RegistrarChaveRequest) returns (RegistroChaveResponse) {}
+}
+
+
+enum TipoDeConta {
+  CONTACORRENTE = 0;
+  CONTAPOUPANCA = 1;
+}
+
+message RegistrarChaveRequest {
+
+  string idCliente = 1;
+  string tipoChave = 2;
+  string valorChave = 3;
+  string tipoConta = 4;
+
+
+
+
+}
+
+message RegistroChaveResponse {
+  string pixId = 1;
+  string chave = 2;
+  string tipoChave = 3;
+
+}
