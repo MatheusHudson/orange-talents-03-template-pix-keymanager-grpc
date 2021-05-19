@@ -4,7 +4,7 @@ import br.com.zup.RegistrarChaveRequest
 import br.com.zup.RegistrarChaveServiceGrpc
 import br.com.zup.RegistroChaveResponse
 import br.com.zup.chave.Enum.TipoDaChave
-import br.com.zup.compartilhado.ChavePixException
+import br.com.zup.compartilhado.exception.ChavePixException
 import br.com.zup.servicosExternos.ErpItau
 import io.grpc.stub.StreamObserver
 import io.micronaut.validation.Validated
@@ -16,7 +16,7 @@ import javax.validation.Valid
 
 @Singleton
 @Validated
-class RegistrarChave(val erpItau: ErpItau, val chaveRepository: ChaveRepository, val chaveRequestValida: ChaveRequestValida) :
+class RegistrarChave(val erpItau: ErpItau, val chaveRepository: ChaveRepository, val chaveRequestValida: RegistraChaveRequestValida) :
     RegistrarChaveServiceGrpc.RegistrarChaveServiceImplBase() {
 
 
@@ -30,7 +30,6 @@ class RegistrarChave(val erpItau: ErpItau, val chaveRepository: ChaveRepository,
         chaveRequestValida.validaRequest( request?.idCliente, request,responseObserver, chaveRepository, erpItau)
         logger.info("Validação finalizada")
 
-
         val tipoChave = TipoDaChave.valueOf(request!!.tipoChave)
         val randomUUID = UUID.randomUUID().toString()
 
@@ -40,18 +39,17 @@ class RegistrarChave(val erpItau: ErpItau, val chaveRepository: ChaveRepository,
             chaveRepository.save(chave)
         }
 
-        salva(chave = chaveModel)
-
-        tipoChave.valida(
+        tipoChave.processaRequest(
             request.valorChave,
             {
                 var chave = request.valorChave
                 if (chave.isBlank())
                     chave = randomUUID
+                salva(chave = chaveModel)
 
                 val response = RegistroChaveResponse.newBuilder()
                     .setChave(chave)
-                    .setPixId(UUID.randomUUID().toString())
+                    .setPixId(chaveModel.id)
                     .setTipoChave(tipoChave.name)
                     .build()
                 responseObserver?.onNext(response)
@@ -62,6 +60,7 @@ class RegistrarChave(val erpItau: ErpItau, val chaveRepository: ChaveRepository,
                     throw  ChavePixException(descricao)
                 )
             })
+
     }
 
 }

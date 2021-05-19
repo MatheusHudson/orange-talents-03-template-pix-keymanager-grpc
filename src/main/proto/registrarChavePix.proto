@@ -5,16 +5,23 @@ option java_package = "br.com.zup";
 option java_outer_classname = "CadastrarChavePix";
 
 
+
 package br.com.zup;
 
 service RegistrarChaveService {
   rpc registrarChave (RegistrarChaveRequest) returns (RegistroChaveResponse) {}
 }
 
+service DeletarChaveService {
+  rpc deletarChave (DeletarChaveRequest) returns (DeletarChaveResponse) {}
+}
+
+
+
 
 enum TipoDeConta {
-  CONTACORRENTE = 0;
-  CONTAPOUPANCA = 1;
+  CONTA_CORRENTE = 0;
+  CONTA_POUPANCA = 1;
 }
 
 message RegistrarChaveRequest {
@@ -24,9 +31,6 @@ message RegistrarChaveRequest {
   string valorChave = 3;
   string tipoConta = 4;
 
-
-
-
 }
 
 message RegistroChaveResponse {
@@ -34,4 +38,13 @@ message RegistroChaveResponse {
   string chave = 2;
   string tipoChave = 3;
 
+}
+
+message DeletarChaveRequest {
+  string pixId = 1;
+  string identificadorCliente = 2;
+  string tipoChave = 3;
+}
+message DeletarChaveResponse {
+ string message = 1;
 }

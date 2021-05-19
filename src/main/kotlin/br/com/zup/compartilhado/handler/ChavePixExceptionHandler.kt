@@ -1,8 +1,7 @@
 package br.com.zup.compartilhado.handler
 
-import br.com.zup.compartilhado.ChavePixException
+import br.com.zup.compartilhado.exception.ChavePixException
 import io.grpc.Status
-import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
 @Singleton

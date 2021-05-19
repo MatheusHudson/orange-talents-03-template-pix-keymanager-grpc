@@ -4,6 +4,7 @@ import br.com.zup.chave.ChaveRepository
 import br.com.zup.chave.Enum.TipoDaChave
 import br.com.zup.servicosExternos.ErpItau
 import br.com.zup.servicosExternos.ErpItauObterClienteResponse
+import br.com.zup.servicosExternos.Titular
 import io.grpc.ManagedChannel
 import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Factory
@@ -40,10 +41,10 @@ class RegistrarChaveTest(
     @BeforeEach
     fun setup() {
 
-        Mockito.`when`(itau.obterCliente("c56dfef4-7901-44fb-84e2-a2cefb157890"))
+        Mockito.`when`(itau.obterCliente("c56dfef4-7901-44fb-84e2-a2cefb157890","CONTA_CORRENTE"))
             .thenReturn(Single.create<HttpResponse<ErpItauObterClienteResponse>?> {
                 HttpResponse.ok(
-                    ErpItauObterClienteResponse("c56dfef4-7901-44fb-84e2-a2cefb157890", "João")
+                    ErpItauObterClienteResponse(Titular("c56dfef4-7901-44fb-84e2-a2cefb157890","João"))
                 )
             })
         chaveRepository.deleteAll()
@@ -56,7 +57,7 @@ class RegistrarChaveTest(
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("CPF")
             .setValorChave("39999679015")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
 
         val response: RegistroChaveResponse = grpc.registrarChave(request)
@@ -73,7 +74,7 @@ class RegistrarChaveTest(
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("CELULAR")
             .setValorChave("(99) 98888-8888")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
 
         val response: RegistroChaveResponse = grpc.registrarChave(request)
@@ -91,7 +92,7 @@ class RegistrarChaveTest(
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("EMAIL")
             .setValorChave("test@test.com")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
 
         val response: RegistroChaveResponse = grpc.registrarChave(request)
@@ -109,7 +110,7 @@ class RegistrarChaveTest(
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("CHAVEALEATORIA")
             .setValorChave("")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
 
         val response: RegistroChaveResponse = grpc.registrarChave(request)
@@ -143,7 +144,7 @@ class RegistrarChaveTest(
                 .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
                 .setTipoChave("CHAVEALEATORIA")
                 .setValorChave("teste")
-                .setTipoConta("CONTACORRENTE")
+                .setTipoConta("CONTA_CORRENTE")
                 .build()
             val msgErroChaveAleatoria = "INVALID_ARGUMENT: Para uma chave aleatoria não insira um valor de chave!"
 
@@ -152,7 +153,7 @@ class RegistrarChaveTest(
                 .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
                 .setTipoChave("CPF")
                 .setValorChave("021542141")
-                .setTipoConta("CONTACORRENTE")
+                .setTipoConta("CONTA_CORRENTE")
                 .build()
             val msgErroCpf =  "INVALID_ARGUMENT: O cpf informado não corresponde com o formato: 12345678901 !"
 
@@ -161,7 +162,7 @@ class RegistrarChaveTest(
                 .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
                 .setTipoChave("EMAIL")
                 .setValorChave("teste.com")
-                .setTipoConta("CONTACORRENTE")
+                .setTipoConta("CONTA_CORRENTE")
                 .build()
             val msgErroEmail = "INVALID_ARGUMENT: O email informado não corresponde com o formato: example@..."
 
@@ -170,7 +171,7 @@ class RegistrarChaveTest(
                 .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
                 .setTipoChave("CELULAR")
                 .setValorChave("31985541145")
-                .setTipoConta("CONTACORRENTE")
+                .setTipoConta("CONTA_CORRENTE")
                 .build()
             val msgErroCelular = "INVALID_ARGUMENT: O celular informado não corresponde com o formato: (99) 98888-8888 "
 
@@ -180,14 +181,14 @@ class RegistrarChaveTest(
                 .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
                 .setTipoChave("CELULA")
                 .setValorChave("(31) 98888-8888")
-                .setTipoConta("CONTACORRENTE")
+                .setTipoConta("CONTA_CORRENTE")
                 .build()
 
             val msgErroEnum = "INVALID_ARGUMENT: Informe um tipo de chave valido!" + "\nFormatos aceitos : ${
                 TipoDaChave.values().map { valoresEnum ->
                     valoresEnum.name
                 }
-            }".substringBeforeLast(", UNRECOGNIZED") + "]"
+            }".substringBeforeLast(", UNRECOGNIZED")
 
             //Tipo de conta informado está presente no ENUM.
             val requestEnunConta = RegistrarChaveRequest.newBuilder()
@@ -227,7 +228,7 @@ class RegistrarChaveTest(
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("CPF")
             .setValorChave("02267244677")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
 
         val thrown = assertThrows<StatusRuntimeException> {
@@ -249,15 +250,16 @@ class RegistrarChaveTest(
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("EMAIL")
             .setValorChave("test@test.com")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
 
         val requestCPF = RegistrarChaveRequest.newBuilder()
             .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
             .setTipoChave("CPF")
             .setValorChave("02545621511")
-            .setTipoConta("CONTACORRENTE")
+            .setTipoConta("CONTA_CORRENTE")
             .build()
+
 
         val responseCpf: RegistroChaveResponse = grpc.registrarChave(requestCPF)
 
@@ -278,7 +280,7 @@ class RegistrarChaveTest(
     @Factory
     class Clients {
         @Singleton
-        fun blockingStub(
+        fun blockingStubRegistra(
             @GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel
         ): RegistrarChaveServiceGrpc.RegistrarChaveServiceBlockingStub? {
             return RegistrarChaveServiceGrpc.newBlockingStub(channel)

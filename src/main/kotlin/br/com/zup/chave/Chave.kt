@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank
 
 @Entity
 class Chave(
-    id: String,
+    idClienteItau: String,
 
     @Enumerated(EnumType.STRING)
     val tipoDaChave: TipoDaChave,
@@ -21,6 +21,6 @@ class Chave(
     var id : String = UUID.randomUUID().toString()
 
     @field:NotBlank
-    val idClienteitau: String = id
-
+    val idClienteItau: String = idClienteItau
 }
+
