@@ -40,3 +40,9 @@ jpa:
         hbm2ddl:
           auto: update
         show_sql: true
+
+my:
+  server:
+    url:
+      erp: 'http://localhost:9091'
+      pixBCB: 'http://localhost:8082'

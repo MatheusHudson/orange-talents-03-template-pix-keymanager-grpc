@@ -2,28 +2,27 @@ package br.com.zup
 
 import br.com.zup.chave.ChaveRepository
 import br.com.zup.chave.Enum.TipoDaChave
-import br.com.zup.servicosExternos.ErpItau
-import br.com.zup.servicosExternos.ErpItauObterClienteResponse
-import br.com.zup.servicosExternos.Titular
+import br.com.zup.servicosExternos.*
 import io.grpc.ManagedChannel
 import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.http.HttpResponse
+import io.micronaut.http.client.exceptions.HttpClientException
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.reactivex.Single
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
+import java.time.LocalDateTime
+import java.util.*
 import java.util.stream.Stream
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,15 +37,31 @@ class RegistrarChaveTest(
     @Inject
     lateinit var itau: ErpItau
 
+    @Inject
+    lateinit var pixChaveBCB: PixChaveBCB
+
+    lateinit var bankAccount:BankAccount
+    lateinit var  owner: Owner
+
     @BeforeEach
     fun setup() {
+        bankAccount = BankAccount("60701190", "0001", "291900", "CACC")
+        owner = Owner(
+            "NATURAL_PERSON", "Rafael M C Ponte", "02467781054"
+        )
 
-        Mockito.`when`(itau.obterCliente("c56dfef4-7901-44fb-84e2-a2cefb157890","CONTA_CORRENTE"))
-            .thenReturn(Single.create<HttpResponse<ErpItauObterClienteResponse>?> {
-                HttpResponse.ok(
-                    ErpItauObterClienteResponse(Titular("c56dfef4-7901-44fb-84e2-a2cefb157890","João"))
+
+        Mockito.`when`(itau.obterCliente("c56dfef4-7901-44fb-84e2-a2cefb157890", "CONTA_CORRENTE"))
+            .thenReturn(
+                Single.just<HttpResponse<ErpItauObterClienteResponse>?>(
+                    HttpResponse.ok(
+                        ErpItauObterClienteResponse(
+                            Titular("c56dfef4-7901-44fb-84e2-a2cefb157890", "Rafael M C Ponte", "02467781054"),
+                            Instituicao("60701190"), "0001", "291900"
+                        )
+                    )
                 )
-            })
+            )
         chaveRepository.deleteAll()
     }
 
@@ -60,11 +75,27 @@ class RegistrarChaveTest(
             .setTipoConta("CONTA_CORRENTE")
             .build()
 
+
+        val chavePixRequestBCB = ChavePixRequestBCB(request.tipoChave, request.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdata = ChavePixResponseBCBdata(
+            request.tipoChave,
+            request.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdata)))
+
+
         val response: RegistroChaveResponse = grpc.registrarChave(request)
+
         assertEquals(request.valorChave, response.chave)
         assertNotNull(response.pixId)
 
     }
+
+
 
     @DisplayName("deveriaRegistrarUmaChaveParaUmCelularValido")
     @Test
@@ -76,6 +107,19 @@ class RegistrarChaveTest(
             .setValorChave("(99) 98888-8888")
             .setTipoConta("CONTA_CORRENTE")
             .build()
+
+
+        val chavePixRequestBCB = ChavePixRequestBCB("PHONE", request.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdata = ChavePixResponseBCBdata(
+            request.tipoChave,
+            request.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdata)))
+
 
         val response: RegistroChaveResponse = grpc.registrarChave(request)
 
@@ -95,6 +139,18 @@ class RegistrarChaveTest(
             .setTipoConta("CONTA_CORRENTE")
             .build()
 
+
+
+        val chavePixRequestBCB = ChavePixRequestBCB(request.tipoChave, request.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdata = ChavePixResponseBCBdata(
+            request.tipoChave,
+            request.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdata)))
+
         val response: RegistroChaveResponse = grpc.registrarChave(request)
 
         assertEquals(request.valorChave, response.chave)
@@ -112,6 +168,18 @@ class RegistrarChaveTest(
             .setValorChave("")
             .setTipoConta("CONTA_CORRENTE")
             .build()
+
+
+        val chavePixRequestBCB = ChavePixRequestBCB("RANDOM", request.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdata = ChavePixResponseBCBdata(
+            request.tipoChave,
+            UUID.randomUUID().toString(), bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdata)))
+
 
         val response: RegistroChaveResponse = grpc.registrarChave(request)
 
@@ -155,7 +223,7 @@ class RegistrarChaveTest(
                 .setValorChave("021542141")
                 .setTipoConta("CONTA_CORRENTE")
                 .build()
-            val msgErroCpf =  "INVALID_ARGUMENT: O cpf informado não corresponde com o formato: 12345678901 !"
+            val msgErroCpf = "INVALID_ARGUMENT: O cpf informado não corresponde com o formato: 12345678901 !"
 
             //Chave Email
             val requestEmail = RegistrarChaveRequest.newBuilder()
@@ -231,6 +299,18 @@ class RegistrarChaveTest(
             .setTipoConta("CONTA_CORRENTE")
             .build()
 
+
+        val chavePixRequestBCB = ChavePixRequestBCB(request.tipoChave, request.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdata = ChavePixResponseBCBdata(
+            request.tipoChave,
+            request.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdata)))
+
+
         val thrown = assertThrows<StatusRuntimeException> {
             grpc.registrarChave(request)
             grpc.registrarChave(request)
@@ -260,6 +340,28 @@ class RegistrarChaveTest(
             .setTipoConta("CONTA_CORRENTE")
             .build()
 
+        val chavePixRequestBCBCPF = ChavePixRequestBCB(requestCPF.tipoChave, requestCPF.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdataCPF = ChavePixResponseBCBdata(
+            requestCPF.tipoChave,
+            requestCPF.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCBCPF))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdataCPF)))
+
+        val chavePixRequestBCBEmail = ChavePixRequestBCB(requestEmail.tipoChave, requestEmail.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdataEmail = ChavePixResponseBCBdata(
+            requestEmail.tipoChave,
+            requestEmail.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCBEmail))
+            .thenReturn(Single.just(HttpResponse.ok(chavePixResponseBCBdataEmail)))
+
+
+
 
         val responseCpf: RegistroChaveResponse = grpc.registrarChave(requestCPF)
 
@@ -272,9 +374,78 @@ class RegistrarChaveTest(
 
     }
 
+
+    @DisplayName("deveRetornarErroPorFaltaDeConexaoAoServicoExternoBCB")
+    @Test
+    fun test8() {
+
+
+        val request = RegistrarChaveRequest.newBuilder()
+            .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
+            .setTipoChave("CPF")
+            .setValorChave("02267244677")
+            .setTipoConta("CONTA_CORRENTE")
+            .build()
+
+
+        val chavePixRequestBCB = ChavePixRequestBCB(request.tipoChave, request.valorChave, bankAccount, owner)
+
+        val chavePixResponseBCBdata = ChavePixResponseBCBdata(
+            request.tipoChave,
+            request.valorChave, bankAccount, owner, LocalDateTime.now().toString()
+        )
+
+        Mockito.`when`(pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB))
+            .thenReturn(Single.error(HttpClientResponseException("Erro", HttpResponse.badRequest("") )))
+
+
+        val thrown = assertThrows<StatusRuntimeException> {
+            grpc.registrarChave(request)
+        }
+
+        with(thrown) {
+            assertEquals("INVALID_ARGUMENT: Dados invalidos ou chave já cadastrada!", message)
+
+        }
+    }
+
+    @DisplayName("deveRetornarErroPorFaltaDeConexaoAoServicoExternoERP")
+    @Test
+    fun test9() {
+
+
+        val request = RegistrarChaveRequest.newBuilder()
+            .setIdCliente("c56dfef4-7901-44fb-84e2-a2cefb157890")
+            .setTipoChave("CPF")
+            .setValorChave("02267244677")
+            .setTipoConta("CONTA_CORRENTE")
+            .build()
+
+
+        Mockito.`when`(itau.obterCliente("c56dfef4-7901-44fb-84e2-a2cefb157890", "CONTA_CORRENTE"))
+            .thenReturn(
+                Single.error(HttpClientException("Erro de conexao"))
+            )
+
+
+        val thrown = assertThrows<StatusRuntimeException> {
+            grpc.registrarChave(request)
+        }
+
+        with(thrown) {
+            assertEquals("UNAVAILABLE: Não foi possivel realizar conexão com o serviço externo", message)
+
+        }
+    }
+
     @MockBean(ErpItau::class)
     fun itauCliente(): ErpItau? {
         return Mockito.mock(ErpItau::class.java)
+    }
+
+    @MockBean(PixChaveBCB::class)
+    fun pixChaveBCB(): PixChaveBCB? {
+        return Mockito.mock(PixChaveBCB::class.java)
     }
 
     @Factory

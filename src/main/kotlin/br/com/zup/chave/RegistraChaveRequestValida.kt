@@ -11,12 +11,14 @@ import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.exceptions.HttpClientException
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.reactivex.Single
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
 @Singleton
 class RegistraChaveRequestValida {
+
 
     fun validaRequest(
 
@@ -27,8 +29,6 @@ class RegistraChaveRequestValida {
         erpItau: ErpItau
     ) {
         val logger = LoggerFactory.getLogger(this::class.java)
-
-
 
 
         //Valida se o tipo de chave informado está presente no ENUM.
@@ -64,36 +64,21 @@ class RegistraChaveRequestValida {
             )
             return
         }
-        //Valida se o id cliente informado está presente  no sistema do Itau
-
-        try {
-            logger.info("Try inicio")
-
-            val erpResponse: Single<HttpResponse<ErpItauObterClienteResponse>> =
-                erpItau.obterCliente(request!!.idCliente, request.tipoConta)
-
-
-        } catch (e: HttpClientException) {
-
-            responseObserver?.onError(
-                Status.NOT_FOUND.withCause(e).withDescription("Id do cliente não encontrado!")
-                    .asRuntimeException()
-            )
-            return
-        }
-
 
 
         when {
 
             //Verificando se chave já está cadastrada no banco de dados
-            request?.valorChave != null &&
-                    chaveRepository.existsByIdClienteItauAndTipoDaChave(
+            !request?.valorChave.isNullOrBlank() &&
+                    (chaveRepository.existsByIdClienteItauAndTipoDaChave(
                         request.idCliente,
                         TipoDaChave.valueOf(request.tipoChave)
                     )
+                            || chaveRepository.existsByValorDaChave(request.valorChave)
+                            )
             -> {
-                throw ChavePixException("Está chave já está cadastrada")
+                responseObserver?.onError(Status.ALREADY_EXISTS.withDescription("Está chave já está cadastrada").asRuntimeException())
+                return
             }
         }
 

@@ -6,11 +6,12 @@ import io.micronaut.data.jpa.repository.JpaRepository
 import java.util.*
 
 @Repository
-interface ChaveRepository: JpaRepository<Chave, String> {
+interface ChaveRepository : JpaRepository<Chave, String> {
 
 
-    fun existsByIdClienteItauAndTipoDaChave(idClienteItau: String, tipoDaChave:TipoDaChave) : Boolean
-    fun existsByIdClienteItauAndIdAndTipoDaChave(idClienteItau: String, id:String, tipoDaChave: TipoDaChave) : Boolean
-
+    fun existsByIdClienteItauAndTipoDaChave(idClienteItau: String, tipoDaChave: TipoDaChave): Boolean
+    fun existsByIdClienteItauAndValorDaChaveAndTipoDaChave(idClienteItau: String, valorDaChave: String, tipoDaChave: TipoDaChave): Boolean
+    fun existsByValorDaChave(valorChave: String): Boolean
+    fun deleteByValorDaChave(valorDaChave: String)
 
 }

@@ -6,7 +6,8 @@ import javax.validation.constraints.NotBlank
 
 @Introspected
 class DeletaChaveValidaRequest(
-    @field:NotBlank val pixId: String,
+    @field:NotBlank val valorDaChave: String,
     @field:NotBlank val identificadorCliente: String,
-    @field: NotBlank @field:TipoChave val tipoDaChave: String
+    @field: NotBlank @field:TipoChave val tipoDaChave: String,
+    @field: NotBlank val participant: String
 )

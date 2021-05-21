@@ -34,18 +34,21 @@ dependencies {
     implementation("io.micronaut.sql:micronaut-hibernate-jpa")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("io.micronaut.sql:micronaut-vertx-mysql-client")
+    implementation("io.micronaut.xml:micronaut-jackson-xml")
 
     implementation("io.micronaut:micronaut-http-client")
     implementation("javax.annotation:javax.annotation-api")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     runtimeOnly("ch.qos.logback:logback-classic")
-    runtimeOnly("com.h2database:h2")
-    implementation("io.micronaut:micronaut-validation")
-    runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
-    testImplementation("io.micronaut:micronaut-http-client")
     runtimeOnly("mysql:mysql-connector-java")
+    runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+
+    implementation("io.micronaut:micronaut-validation")
+    testImplementation("io.micronaut:micronaut-http-client")
+
+    runtimeOnly("com.h2database:h2")
     testAnnotationProcessor  ("io.micronaut:micronaut-inject-java")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("io.micronaut.test:micronaut-test-junit5:2.3.3")

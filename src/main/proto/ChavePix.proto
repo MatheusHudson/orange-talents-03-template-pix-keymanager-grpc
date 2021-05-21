@@ -17,8 +17,6 @@ service DeletarChaveService {
 }
 
 
-
-
 enum TipoDeConta {
   CONTA_CORRENTE = 0;
   CONTA_POUPANCA = 1;
@@ -41,10 +39,12 @@ message RegistroChaveResponse {
 }
 
 message DeletarChaveRequest {
-  string pixId = 1;
+  string valorDaChave = 1;
   string identificadorCliente = 2;
   string tipoChave = 3;
+  string participant = 4;
 }
 message DeletarChaveResponse {
- string message = 1;
+ string chave = 1;
+ string participant = 2;
 }

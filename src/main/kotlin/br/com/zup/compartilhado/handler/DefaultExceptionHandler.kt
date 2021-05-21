@@ -2,6 +2,7 @@ package br.com.zup.compartilhado.handler
 
 
 import io.grpc.Status
+import io.micronaut.http.client.exceptions.HttpClientException
 import javax.validation.ConstraintViolationException
 
 /**
@@ -21,6 +22,7 @@ class DefaultExceptionHandler : ExceptionHandler<Exception> {
             is IllegalArgumentException -> Status.INVALID_ARGUMENT.withDescription(e.message)
             is IllegalStateException -> Status.FAILED_PRECONDITION.withDescription(e.message)
             is ConstraintViolationException -> Status.INVALID_ARGUMENT.withDescription(e.message!!.substringAfter(":").substringBefore(","))
+            is HttpClientException -> Status.ABORTED.withDescription(e.message)
             else -> Status.UNKNOWN
         }
         return ExceptionHandler.StatusWithDetails(status.withCause(e))

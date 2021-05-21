@@ -8,7 +8,7 @@ import io.micronaut.http.client.annotation.Client
 import io.reactivex.Single
 
 
-@Client("\${my.server.url:`http://localhost:9091`}")
+@Client("\${my.server.url.erp:`http://localhost:9091`}")
 interface ErpItau {
 
         @Get("/api/v1/clientes/{clienteId}/contas?tipo={conta}")
