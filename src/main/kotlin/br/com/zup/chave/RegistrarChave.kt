@@ -71,18 +71,15 @@ class RegistrarChave(
 
             val erpResponses = erpResponse.body()
 
-            logger.info(" Pegou o body ")
-
             val chavePixRequestBCB = request.criaChavePixRequestBCB(request, erpResponses)
 
-            logger.info(" Criou a chave")
+
 
             pixChaveBCB.registrarChavePixNoBCB(chavePixRequestBCB).subscribe({ pixResponse ->
-                logger.info("Executado")
 
                 val registrarChavePixNoBCB = pixResponse.body()
 
-                chaveModel = validaModel(request.toModel(registrarChavePixNoBCB.key, tipoChave))
+                chaveModel = validaModel(request.toModel(registrarChavePixNoBCB.key, tipoChave, erpResponses))
 
                 var chave = request.valorChave
                 if (chave.isBlank())
@@ -93,8 +90,6 @@ class RegistrarChave(
                     .setPixId(chaveModel.id)
                     .setTipoChave(tipoChave.name)
                     .build()
-
-                logger.info("executei sucesso")
 
                 chaveRepository.save(chaveModel)
                 responseObserver?.onNext(response)
@@ -115,6 +110,8 @@ class RegistrarChave(
 
 
         }, { exception ->
+            logger.info("Exception",exception)
+
             when {
                 exception is HttpClientResponseException -> responseObserver?.onError(
                     Status.INVALID_ARGUMENT.withDescription(

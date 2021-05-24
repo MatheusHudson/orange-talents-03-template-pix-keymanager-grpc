@@ -70,7 +70,7 @@ class RegistraChaveRequestValida {
 
             //Verificando se chave já está cadastrada no banco de dados
             !request?.valorChave.isNullOrBlank() &&
-                    (chaveRepository.existsByIdClienteItauAndTipoDaChave(
+                    (chaveRepository.existsByTitularIdTitularAndTipoDaChave(
                         request.idCliente,
                         TipoDaChave.valueOf(request.tipoChave)
                     )

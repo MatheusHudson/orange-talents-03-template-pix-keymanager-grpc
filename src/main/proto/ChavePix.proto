@@ -16,6 +16,42 @@ service DeletarChaveService {
   rpc deletarChave (DeletarChaveRequest) returns (DeletarChaveResponse) {}
 }
 
+service BuscarChavePix {
+  rpc buscarUmaChavePix (BuscarChavePixRequest) returns (BuscarChavePixResponse) {}
+}
+
+
+message BuscarChavePixRequest {
+  message PixBuscar {
+
+    string pixId = 1;
+    string identificadorCliente = 2;
+  }
+
+
+  oneof filtro  {
+
+    PixBuscar buscarChave = 1;
+    string chavePix = 2;
+
+  }
+
+}
+
+
+message BuscarChavePixResponse {
+
+  string tipoDaChave = 1;
+  string valorDaChave = 2;
+  string nome = 3;
+  string cpf = 4;
+  string nomeBanco = 5;
+  string agencia = 6;
+  string numeroConta = 7;
+  string tipoDaConta = 8;
+  string createdAt = 9;
+
+}
 
 enum TipoDeConta {
   CONTA_CORRENTE = 0;
@@ -45,6 +81,6 @@ message DeletarChaveRequest {
   string participant = 4;
 }
 message DeletarChaveResponse {
- string chave = 1;
- string participant = 2;
+  string chave = 1;
+  string participant = 2;
 }

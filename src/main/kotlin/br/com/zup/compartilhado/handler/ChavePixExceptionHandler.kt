@@ -17,6 +17,14 @@ class ChavePixExceptionHandler : ExceptionHandler<ChavePixException> {
             )
         }
 
+        if(e.message == "Chave não foi encontrada!") {
+            return ExceptionHandler.StatusWithDetails(
+                Status.NOT_FOUND
+                    .withDescription(e.message)
+                    .withCause(e)
+            )
+        }
+
         return ExceptionHandler.StatusWithDetails(
             Status.INVALID_ARGUMENT
                 .withDescription(e.message)

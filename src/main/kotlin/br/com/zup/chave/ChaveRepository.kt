@@ -9,8 +9,15 @@ import java.util.*
 interface ChaveRepository : JpaRepository<Chave, String> {
 
 
-    fun existsByIdClienteItauAndTipoDaChave(idClienteItau: String, tipoDaChave: TipoDaChave): Boolean
-    fun existsByIdClienteItauAndValorDaChaveAndTipoDaChave(idClienteItau: String, valorDaChave: String, tipoDaChave: TipoDaChave): Boolean
+    fun findByValorDaChave(valorDaChave: String): Optional<Chave>
+    fun findByIdAndTitularIdTitular(id: String, idTitular: String): Optional<Chave>
+    fun existsByTitularIdTitularAndTipoDaChave(idClienteItau: String, tipoDaChave: TipoDaChave): Boolean
+    fun existsByTitularIdTitularAndValorDaChaveAndTipoDaChave(
+        idTitular: String,
+        valorDaChave: String,
+        tipoDaChave: TipoDaChave
+    ): Boolean
+
     fun existsByValorDaChave(valorChave: String): Boolean
     fun deleteByValorDaChave(valorDaChave: String)
 

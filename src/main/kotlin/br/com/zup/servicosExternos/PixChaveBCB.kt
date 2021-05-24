@@ -13,11 +13,12 @@ interface PixChaveBCB {
     fun registrarChavePixNoBCB(@Body chavePixRequestBCB: ChavePixRequestBCB ) : Single<HttpResponse<ChavePixResponseBCBdata>>
 
     @Get("/api/v1/pix/keys/{key}", consumes = [MediaType.APPLICATION_XML], produces = [MediaType.APPLICATION_XML])
-    fun  buscarChavePix(@PathVariable key: String) : Single<HttpResponse<ChavePixResponseBCBdata>>
+    fun  buscarChavePix(@PathVariable key: String) : HttpResponse<ChavePixResponseBCBdata>
 
     @Delete("/api/v1/pix/keys/{key}", consumes = [MediaType.APPLICATION_XML], produces = [MediaType.APPLICATION_XML])
     fun excluirChavePix(@PathVariable key: String, @Body deletePixRequest : DeletePixRequest) :Single<ChaveDeleteResponse>
 }
+
 
 
 data class ChaveDeleteResponse(val key: String, val participant: String, val deletedAt: String)

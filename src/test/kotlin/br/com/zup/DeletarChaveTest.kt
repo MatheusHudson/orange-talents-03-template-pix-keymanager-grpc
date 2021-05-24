@@ -3,10 +3,7 @@ package br.com.zup
 import br.com.zup.chave.Chave
 import br.com.zup.chave.ChaveRepository
 import br.com.zup.chave.Enum.TipoDaChave
-import br.com.zup.servicosExternos.ChaveDeleteResponse
-import br.com.zup.servicosExternos.DeletePixRequest
-import br.com.zup.servicosExternos.ErpItau
-import br.com.zup.servicosExternos.PixChaveBCB
+import br.com.zup.servicosExternos.*
 import io.grpc.ManagedChannel
 import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Factory
@@ -39,9 +36,11 @@ class DeletarChaveTest(
     val grpc: DeletarChaveServiceGrpc.DeletarChaveServiceBlockingStub
 ) {
 
-
     @Inject
     lateinit var pixChaveBCB: PixChaveBCB
+
+    val titular = Titular("c56dfef4-7901-44fb-84e2-a2cefb157890", "Rafael M C Ponte", "02467781054")
+    val instituicao = Instituicao("60701190", "ITAU BANK")
 
     @BeforeEach
     fun setup() {
@@ -51,12 +50,21 @@ class DeletarChaveTest(
     @DisplayName("deveriaDeletarUmaChavePix")
     @Test
     fun test1() {
-        val chave = Chave("c56dfef4-7901-44fb-84e2-a2cefb157890", TipoDaChave.CPF, "02414521663")
+
+        val chave = Chave(
+            TipoDaChave.CPF,
+            "02414521663",
+            "CONTA_CORRENTE",
+            "0001",
+            "291900",
+            br.com.zup.chave.Titular(titular),
+            br.com.zup.chave.Instituicao(instituicao)
+          )
         chaveRepository.save(chave)
 
         val request = DeletarChaveRequest.newBuilder()
             .setValorDaChave("02414521663")
-            .setIdentificadorCliente(chave.idClienteItau)
+            .setIdentificadorCliente(chave.titular.idTitular)
             .setTipoChave("CPF")
             .setParticipant("60701190")
             .build()
@@ -91,12 +99,19 @@ class DeletarChaveTest(
     @DisplayName("deveriaRetornarErroAoReceberUmHttpResponseException")
     @Test
     fun test3() {
-        val chave = Chave("c56dfef4-7901-44fb-84e2-a2cefb157890", TipoDaChave.CPF, "02414521663")
+        val chave = Chave(
+            TipoDaChave.CPF,
+            "02414521663",
+            "CONTA_CORRENTE",
+            "0001",
+            "291900",
+            br.com.zup.chave.Titular(titular),
+            br.com.zup.chave.Instituicao(instituicao))
         chaveRepository.save(chave)
 
         val request = DeletarChaveRequest.newBuilder()
             .setValorDaChave("02414521663")
-            .setIdentificadorCliente(chave.idClienteItau)
+            .setIdentificadorCliente(chave.titular.idTitular)
             .setTipoChave("CPF")
             .setParticipant("60701191")
             .build()
@@ -121,12 +136,20 @@ class DeletarChaveTest(
     @DisplayName("deveriaRetornarErroAoReceberUmHttpClientException")
     @Test
     fun test4() {
-        val chave = Chave("c56dfef4-7901-44fb-84e2-a2cefb157890", TipoDaChave.CPF, "02414521663")
+        val chave = Chave(
+            TipoDaChave.CPF,
+            "02414521663",
+            "CONTA_CORRENTE",
+            "0001",
+            "291900",
+            br.com.zup.chave.Titular(titular),
+            br.com.zup.chave.Instituicao(instituicao))
+
         chaveRepository.save(chave)
 
         val request = DeletarChaveRequest.newBuilder()
             .setValorDaChave("02414521663")
-            .setIdentificadorCliente(chave.idClienteItau)
+            .setIdentificadorCliente(chave.titular.idTitular)
             .setTipoChave("CPF")
             .setParticipant("60701191")
             .build()
@@ -152,19 +175,29 @@ class DeletarChaveTest(
 
         @JvmStatic
         fun criandoArgumentosParaOTeste2(): Stream<Arguments> {
-            val chave = Chave("c56dfef4-7901-44fb-84e2-a2cefb157890", TipoDaChave.CPF, "02414521663")
+            val titular = Titular("c56dfef4-7901-44fb-84e2-a2cefb157890", "Rafael M C Ponte", "02467781054")
+            val instituicao = Instituicao("60701190", "ITAU BANK")
+
+            val chave = Chave(
+                TipoDaChave.CPF,
+                "02414521663",
+                "CONTA_CORRENTE",
+                "0001",
+                "291900",
+                br.com.zup.chave.Titular(titular),
+                br.com.zup.chave.Instituicao(instituicao))
 
 
             val requestIdInvalido = DeletarChaveRequest.newBuilder()
                 .setValorDaChave(chave.valorDaChave + "1")
-                .setIdentificadorCliente(chave.idClienteItau)
+                .setIdentificadorCliente(chave.titular.idTitular)
                 .setTipoChave("CPF")
                 .setParticipant("60701190")
                 .build()
 
             val requestIdentificadorInvalido = DeletarChaveRequest.newBuilder()
                 .setValorDaChave(chave.valorDaChave)
-                .setIdentificadorCliente(chave.idClienteItau + "1")
+                .setIdentificadorCliente(chave.titular.idTitular + "1")
                 .setTipoChave("CPF")
                 .setParticipant("60701190")
                 .build()

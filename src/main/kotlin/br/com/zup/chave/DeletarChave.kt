@@ -37,7 +37,7 @@ class DeletarChave(val chaveRepository: ChaveRepository, val pixChaveBCB: PixCha
 
         when {
 
-            chaveRepository.existsByIdClienteItauAndValorDaChaveAndTipoDaChave(
+            chaveRepository.existsByTitularIdTitularAndValorDaChaveAndTipoDaChave(
                 requestValido.identificadorCliente,
                 requestValido.valorDaChave,
                 TipoDaChave.valueOf(requestValido.tipoDaChave!!)

@@ -57,7 +57,7 @@ class RegistrarChaveTest(
                     HttpResponse.ok(
                         ErpItauObterClienteResponse(
                             Titular("c56dfef4-7901-44fb-84e2-a2cefb157890", "Rafael M C Ponte", "02467781054"),
-                            Instituicao("60701190"), "0001", "291900"
+                            Instituicao("60701190", "ITAU BANK"), "0001", "291900", "CONTA_CORRENTE"
                         )
                     )
                 )

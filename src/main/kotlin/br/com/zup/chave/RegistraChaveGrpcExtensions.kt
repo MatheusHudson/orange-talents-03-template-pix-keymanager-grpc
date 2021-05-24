@@ -8,14 +8,28 @@ import br.com.zup.servicosExternos.ErpItauObterClienteResponse
 import br.com.zup.servicosExternos.Owner
 
 
-fun RegistrarChaveRequest.toModel(randomUUID: String, tipoChave: TipoDaChave): Chave {
-        var chaveValor = this.valorChave
+fun RegistrarChaveRequest.toModel(
+    randomUUID: String,
+    tipoChave: TipoDaChave,
+    erpResponse: ErpItauObterClienteResponse
+): Chave {
+    var chaveValor = this.valorChave
+    val titular = Titular(erpResponse.titular)
+    val instituicao = Instituicao(erpResponse.instituicao)
 
-        if (this.valorChave.isBlank() && tipoChave == TipoDaChave.CHAVEALEATORIA) {
-            chaveValor = randomUUID
-        }
-        return Chave(this.idCliente, tipoChave, chaveValor)
+    if (this.valorChave.isBlank() && tipoChave == TipoDaChave.CHAVEALEATORIA) {
+        chaveValor = randomUUID
     }
+    return Chave(
+        tipoChave,
+        chaveValor,
+        erpResponse.tipo,
+        erpResponse.agencia,
+        erpResponse.numero,
+        titular = titular,
+       instituicao = instituicao
+    )
+}
 
 fun RegistrarChaveRequest.criaChavePixRequestBCB(
     request: RegistrarChaveRequest,
@@ -24,7 +38,7 @@ fun RegistrarChaveRequest.criaChavePixRequestBCB(
     var tipoChave = request.tipoChave
 
     when {
-        tipoChave == "CELULAR" ->  tipoChave = "PHONE"
+        tipoChave == "CELULAR" -> tipoChave = "PHONE"
         tipoChave == "CHAVEALEATORIA" -> tipoChave = "RANDOM"
     }
 
