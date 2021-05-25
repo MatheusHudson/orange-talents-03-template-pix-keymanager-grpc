@@ -20,5 +20,6 @@ interface ChaveRepository : JpaRepository<Chave, String> {
 
     fun existsByValorDaChave(valorChave: String): Boolean
     fun deleteByValorDaChave(valorDaChave: String)
+    fun findAllByTitularIdTitular(codigoInternoCliente: String?): List<Chave>
 
 }

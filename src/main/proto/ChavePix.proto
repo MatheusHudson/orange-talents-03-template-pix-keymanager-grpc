@@ -4,8 +4,6 @@ option java_multiple_files = true;
 option java_package = "br.com.zup";
 option java_outer_classname = "CadastrarChavePix";
 
-
-
 package br.com.zup;
 
 service RegistrarChaveService {
@@ -20,6 +18,28 @@ service BuscarChavePix {
   rpc buscarUmaChavePix (BuscarChavePixRequest) returns (BuscarChavePixResponse) {}
 }
 
+service BuscarListaDeChavePix {
+  rpc buscarListaDeChave (BuscarListaChaveRequest) returns (BuscarListaChaveRequestResponse) {}
+}
+
+message BuscarListaChaveRequest {
+  string codigoInternoCliente = 1;
+}
+
+message BuscarListaChaveRequestResponse {
+  message ChavePix{
+    string pixId =1;
+    string identificadorCliente = 2;
+    string tipoDaChave = 3;
+    string valorDaChave = 4;
+    string tipoDeConta= 5;
+    string createdAt = 6;
+  }
+
+  string clienteId= 1;
+  repeated ChavePix listaChave = 2;
+
+}
 
 message BuscarChavePixRequest {
   message PixBuscar {
