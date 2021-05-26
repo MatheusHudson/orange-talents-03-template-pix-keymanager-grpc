@@ -57,7 +57,6 @@ sealed class Filtro {
             }
 
         }
-
     }
 
     abstract fun buscarChave(chaveRepository: ChaveRepository, pixChaveBCB: PixChaveBCB): BuscarChavePixResponse

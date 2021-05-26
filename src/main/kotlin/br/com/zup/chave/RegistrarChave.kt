@@ -8,19 +8,12 @@ import br.com.zup.compartilhado.exception.ChavePixException
 import br.com.zup.servicosExternos.*
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.exceptions.HttpClientException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.validation.Validated
-import io.reactivex.Single
 import org.slf4j.LoggerFactory
-import java.lang.Exception
-import java.net.ConnectException
-import javax.annotation.meta.When
 import javax.inject.Singleton
 import javax.validation.Valid
-import kotlin.concurrent.thread
-import kotlin.math.log
 
 
 @Singleton
@@ -59,13 +52,13 @@ class RegistrarChave(
         val tipoChave = TipoDaChave.valueOf(request!!.tipoChave)
 
 
-        tipoChave.valida(
+        val eValido = tipoChave.valida(
             request.valorChave
         ) { descricao: String ->
-            responseObserver?.onError(
                 throw  ChavePixException(descricao)
-            )
         }
+
+     logger.info("io")
 
         erpItau.obterCliente(request!!.idCliente, request.tipoConta).subscribe({ erpResponse ->
 
